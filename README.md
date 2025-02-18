@@ -1,9 +1,9 @@
 
 # Medium clone implemented with NestJS
 
-Notes:
+Notes for psql:
 // to log in
-psql -U postgres
+❯ psql -U postgres
 
 display the users
 \du;
@@ -24,7 +24,10 @@ describe the table schema
 \d table_name;
 
 display all the tables
-\dt
+\dt;
+
+better table records
+\x;
 
 ## fixes and configs
 
@@ -66,13 +69,16 @@ package.json
 src/ormconfig.ts
 
 ```ts
-synchronize: false,
+{
+    synchronize: false,
 migrations: [__dirname + ‘/migrations/**/*{.ts,.js}’],
+}
 ```
 
 ```bash
-> npm run db:drop
-> npm run db:create src/migrations/CreateTags
+❯ npm run db:drop
+❯ npm run db:create src/migrations/CreateTags
+❯ npm run db:migrate
 ```
 
 ```ts
@@ -80,3 +86,22 @@ const userByEmail = await this.userRepository.findOne({ where: email: createUser
 ```
 
 https://github.com/gothinkster/realworld/tree/main/api
+
+```bash
+❯ yarn db:create src/migrations/CreateTags
+❯ yarn db:create src/migrations/CreateUsers
+❯ yarn db:create src/migrations/CreateArticles
+❯ npm run db:create src/migrations/AddRelationsBetweenArticlesAndUsers
+```
+### Issue - migrations are not being applied
+The database connection is not correctly established
+
+If TypeORM can’t reach your database, it won’t apply migrations.
+
+🔹 Fix: Test the connection manually:
+
+```bash
+❯ npx ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js -d src/ormdatasource.ts schema:sync
+```
+
+If you see a connection error, check your .env or database credentials in ormdatasource.ts.
