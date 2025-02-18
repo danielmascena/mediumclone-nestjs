@@ -4,6 +4,7 @@ import { AuthGuard } from "@app/user/guards/auth.guard";
 import { User } from "@app/user/decorators/user.decorator";
 import { CreateArticleDTO } from "./dto/createArticle.dto";
 import { UserEntity } from "@app/user/user.entity";
+import { ArticleResponseInterface } from "./types/articleResponse.interface";
 
 @Controller('articles')
 export class ArticleController {
@@ -12,8 +13,9 @@ export class ArticleController {
 
     @Post()
     @UseGuards(AuthGuard)
-    async create(@User() user: UserEntity, @Body('article') createArticleDTO: CreateArticleDTO): Promise<any> {
-        return await this.articleService.createArticle(user, createArticleDTO);
+    async create(@User() user: UserEntity, @Body('article') createArticleDTO: CreateArticleDTO): Promise<ArticleResponseInterface> {
+        const article = await this.articleService.createArticle(user, createArticleDTO);
+        return this.articleService.buildArticleResponse(article);
     }
 
     @Get()
